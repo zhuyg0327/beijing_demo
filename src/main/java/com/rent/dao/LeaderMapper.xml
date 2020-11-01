@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rent.dao.LeaderDao">
+<!--    HashMap类型 配置-->
+<!--    <resultMap id="UserMap" type="org.lanqiao.model.User">-->
+<!--        <id property="userId" column="userid" javaType="VARCHAR"></id>-->
+<!--        <result property="userName" column="username" javaType="VARCHAR"></result>-->
+<!--        <result property="userPassword" column="userpassword" javaType="VARCHAR"></result>-->
+<!--    </resultMap>-->
+<!-- 查询所有-->
+    <select id="queryall"  resultType="com.rent.entity.Leader">
+    select *
+    from leader
+    where 1=1
+    order by sort
+  </select>
+
+</mapper>

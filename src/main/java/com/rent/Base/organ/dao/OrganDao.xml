@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rent.Base.organ.dao.OrganDao">
+    <resultMap id="resultMap" type="com.rent.Base.organ.entity.Organ">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="parentId" column="parent_id"></result>
+        <result property="treePath" column="tree_path"></result>
+        <result property="sort" column="sort"></result>
+        <result property="isdelete" column="isdelete"></result>
+        <result property="code" column="code"></result>
+        <result property="timestamp" column="timestamp"></result>
+        <result property="type" column="type"></result>
+        <result property="deptOfficer" column="dept_officer"></result>
+    </resultMap>
+    <select id="queryObject" resultMap="resultMap">
+		select * from organ where ID = #{id}
+	</select>
+    <!-- 查询父级-->
+    <select id="findByParentId" resultMap="resultMap">
+        select * from
+        organ
+        where
+        PARENT_ID = #{parentId}
+        order by SORT
+  </select>
+
+    <select id="findAllDeptById" resultMap="resultMap">
+        select * from
+        organ
+        where
+        TREE_PATH like '%'||#{deptId}||'%' "
+  </select>
+
+    <select id="findAllByparentId" resultMap="resultMap">
+       select ID
+       from organ start with ID= #{id} connect by prior ID = PARENT_ID
+  </select>
+
+    <insert id="save" parameterType="com.rent.Base.organ.entity.Organ">
+		insert into BASE_APP_ORGAN
+		(
+			"ID",
+			"TREE_PATH",
+			"ISDELETE",
+			"NAME",
+			"TIMESTAMP",
+			"SORT",
+			"TYPE",
+			"CODE",
+			"PARENT_ID",
+			"DEPT_OFFICER"
+		)
+		values
+		(
+			#{id},
+			#{treePath},
+			#{isdelete},
+			#{name},
+			#{timestamp},
+			#{sort},
+			#{type},
+			#{code},
+			#{parentId},
+			#{deptOfficer}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.rent.Base.organ.entity.Organ">
+        update BASE_APP_ORGAN
+        <set>
+            <if test="treePath != null">"TREE_PATH" = #{treePath},</if>
+            <if test="isdelete != null">"ISDELETE" = #{isdelete},</if>
+            <if test="name != null">"NAME" = #{name},</if>
+            <if test="timestamp != null">"TIMESTAMP" = #{timestamp},</if>
+            <if test="sort != null">"SORT" = #{sort},</if>
+            <if test="type != null">"TYPE" = #{type},</if>
+            <if test="code != null">"CODE" = #{code},</if>
+            <if test="parentId != null">"PARENT_ID" = #{parentId},</if>
+            <if test="deptOfficer != null">"DEPT_OFFICER" = #{deptOfficer}</if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from BASE_APP_ORGAN where ID = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        delete from BASE_APP_ORGAN where ID in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="queryUserOrg" resultMap="resultMap">
+       select organid from BASE_APP_USER a,BASE_APP_ORGAN b where  b.ID=a.ORGANID and a.user_id=#{userId}
+    </select>
+</mapper>
