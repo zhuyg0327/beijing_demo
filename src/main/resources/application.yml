@@ -11,8 +11,13 @@ spring:
     password: 123456
     url: jdbc:mysql://localhost:3306/beijing_demo?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
     username: root
+  #文件上传设置
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 1000MB
 
-#mybatis设置
+
 mybatis:
   mapper-locations: classpath*:com/**/dao/*.xml
   #type-aliases-package: com.rent.entity
@@ -43,10 +48,6 @@ redis:
   port: 6379
 #password： 123456
 
-#文件上传设置
-servlet:
-  multipart:
-    enabled: true
-    max-file-size: 5000000
-    max-request-size: 5000000
+
+
 

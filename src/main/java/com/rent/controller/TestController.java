@@ -8,6 +8,7 @@ import com.rent.service.BaseAppUserService;
 import com.rent.service.UserService;
 import com.rent.util.DocUtil;
 import com.rent.util.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -23,14 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Document;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -243,10 +242,86 @@ public class TestController {
     @RequestMapping("/test4")
     public void test4() {
         File file = new File("F:\\项目练习\\readWord\\test.doc");
-        String path=file.getPath();
-        Map<String,Object> map=new HashMap<>();
-        map= DocUtil.readWordImage(file);
+        String path = file.getPath();
+        Map<String, Object> map = new HashMap<>();
+        map = DocUtil.readWordImage(file);
         Response.json(map);
+    }
+
+    /**
+     * 校验时间段是否有重合
+     */
+    /**
+     * 判断给定时间段[startX,endX]是否与已知时间段存在交集,不存在返回true
+     *
+     * @param startX     例：2020/02/18 00:00:00
+     * @param endX       例：2020/04/18 24:00:00
+     * @param originList 正序存储的时间段集合[{start:A0,end:A1},{start:B0,end:B1}]
+     * @return
+     */
+    public static boolean isNormal(String startX, String endX, List<Map<String, Object>> originList) {
+        if (StringUtils.isNotBlank(startX) && StringUtils.isNotBlank(endX)) {
+            startX = formatDate(startX);
+            endX = formatDate(endX);
+            if (originList != null && originList.size() > 0) {
+                List<String> startList = new ArrayList<String>();
+                List<String> endList = new ArrayList<String>();
+                for (int i = 0; i < originList.size(); i++) {
+                    startList.add(formatDate((String) originList.get(i).get("start")));
+                    endList.add(formatDate((String) originList.get(i).get("end")));
+                }
+                String minStart = startList.get(0);
+                String maxEnd = endList.get(endList.size() - 1);
+                if (endX.compareTo(minStart) < 0) {
+                    return true;
+                }
+                if (startX.compareTo(maxEnd) > 0) {
+                    return true;
+                }
+                int minStartIndex = 0;
+                if (startX.compareTo(minStart) > 0) {
+                    if (startX.compareTo(endList.get(minStartIndex)) > 0) {// 即startX>A1
+                        for (int i = minStartIndex; i < startList.size(); i++) {
+                            if (startX.compareTo(startList.get(i)) < 0) {
+                                if (endX.compareTo(startList.get(i)) < 0) {
+                                    return true;
+                                }
+                            } else {
+                                minStartIndex += 1;
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static String formatDate(String date) {
+        if (date != null) {
+            date = date.replace("/", "").replace(":", "").replace(" ", "");
+        } else {
+            date = "";
+        }
+        return date;
+    }
+
+    @RequestMapping("/test5")
+    public void checkData(String start,String end) {
+        //默认重合为false，不重合为ture
+        Boolean flag = false;
+        List<Map<String, Object>> originList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map1 = new HashMap<String, Object>();
+        map1.put("start", "2020:11:21 12:15:00");
+        map1.put("end", "2020/11/21 23:11:00");
+        originList.add(map1);
+        flag = isNormal(start, end, originList);
+        if(flag){
+            Response.json("success","时间段不重合");
+        }else {
+            Response.json("success","时间段重合");
+        }
     }
 
 }
