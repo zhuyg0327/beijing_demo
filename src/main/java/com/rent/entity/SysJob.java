@@ -1,7 +1,10 @@
 package com.rent.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 public class SysJob {
     private static final long serialVersionUID = 1L;
@@ -45,6 +48,23 @@ public class SysJob {
      * 任务状态（0正常 1暂停）
      */
     private String status;
+
+    /** 创建者 */
+    private String createBy;
+
+    /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
+
+    /** 更新者 */
+    private String updateBy;
+
+    /** 更新时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date updateTime;
+
+    /** 备注 */
+    private String remark;
 
     public Long getJobId() {
         return jobId;
